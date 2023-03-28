@@ -73,6 +73,8 @@ summary(yrbss$weight)
 
 2.  How many observations are we missing weights from?
 
+There are 1004 missing weights observations. 
+
 Next, consider the possible relationship between a high schooler's weight and their physical activity. Plotting the data is a useful first step because it helps us quickly visualize trends, identify strong associations, and develop research questions.
 
 First, let's create a new variable `physical_3plus`, which will be coded as either "yes" if they are physically active for at least 3 days a week, and "no" if not.
@@ -85,6 +87,13 @@ yrbss <- yrbss %>%
 
 3.  Make a side-by-side boxplot of `physical_3plus` and `weight`. Is there a relationship between these two variables? What did you expect and why?
 
+```{r boxplot}
+yrbss |> 
+  ggplot(aes(x = physical_3plus, y = weight)) +
+  geom_boxplot(na.rm = TRUE)
+```
+
+I would expect for there to be no relationship between weight and days physically active. This is because in people can weigh more naturally, but also weigh more depending on the amount of body muscle obtained, which weighs heavier than fat. The box plot shows that there is not a definitive relationship with each other and the IQR is equivalent to each other.  
 
 The box plots show how the medians of the two distributions compare, but we can also compare the means of the distributions using the following to first group the data by the `physical_3plus` variable, and then calculate the mean `weight` in these groups using the `mean` function while ignoring missing values by setting the `na.rm` argument to `TRUE`.
 
