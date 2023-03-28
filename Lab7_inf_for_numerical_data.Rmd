@@ -59,6 +59,8 @@ Remember that you can answer this question by viewing the data in the data viewe
 glimpse(yrbss)
 ```
 
+There are 13,583 cases within the sample. Each case is a high school student responses to a survey. 
+
 ## Exploratory data analysis
 
 You will first start with analyzing the weight of the participants in kilograms: `weight`.
