@@ -93,7 +93,7 @@ yrbss |>
   geom_boxplot(na.rm = TRUE)
 ```
 
-I would expect for there to be no relationship between weight and days physically active. This is because in people can weigh more naturally, but also weigh more depending on the amount of body muscle obtained, which weighs heavier than fat. The box plot shows that there is not a definitive relationship with each other and the IQR is equivalent to each other.  
+I would expect for there to be no relationship between weight and days physically active. This is because people can weigh more naturally, but also weigh more depending on the amount of body muscle obtained, which weighs heavier than fat. The box plot shows that there is not a definitive relationship with each other. 
 
 The box plots show how the medians of the two distributions compare, but we can also compare the means of the distributions using the following to first group the data by the `physical_3plus` variable, and then calculate the mean `weight` in these groups using the `mean` function while ignoring missing values by setting the `na.rm` argument to `TRUE`.
 
@@ -109,7 +109,12 @@ There is an observed difference, but is this difference statistically significan
 
 4.  Are all conditions necessary for inference satisfied? Comment on each. You can compute the group sizes with the `summarize` command above by defining a new variable with the definition `n()`.
 
+It is not explicitly stated, but we have to assume that the CDC conducted a random sample, independent of bias. As for the sample size of 13,583, whenever a sample size is >30, we can use the Central Limit Theorem to let us assume it is normally distributed. 
+
 5.  Write the hypotheses for testing if the average weights are different for those who exercise at least times a week and those who don't.
+
+Null hypothesis is μ1=μ2, where both groups of students who are active >3 days and students active <= 3 days are equal in average weights.
+The alternative hypothesis is where μ1≠μ2. 
 
 Next, we will introduce a new function, `hypothesize`, that falls into the `infer` workflow. You will use this method for conducting hypothesis tests. 
 
@@ -117,6 +122,7 @@ But first, we need to initialize the test, which we will save as `obs_diff`.
 
 ```{r inf-weight-habit-ht-initial, tidy=FALSE, warning = FALSE}
 obs_diff <- yrbss %>%
+  drop_na(weight,physical_3plus) %>%
   specify(weight ~ physical_3plus) %>%
   calculate(stat = "diff in means", order = c("yes", "no"))
 ```
@@ -127,6 +133,7 @@ After you have initialized the test, you need to simulate the test on the null d
 
 ```{r inf-weight-habit-ht-null, tidy=FALSE, warning = FALSE}
 null_dist <- yrbss %>%
+  drop_na(weight,physical_3plus) %>%
   specify(weight ~ physical_3plus) %>%
   hypothesize(null = "independence") %>%
   generate(reps = 1000, type = "permute") %>%
@@ -146,6 +153,8 @@ ggplot(data = null_dist, aes(x = stat)) +
 
 
 6. How many of these `null` permutations have a difference of at least `obs_stat`?
+
+Using the null_dist histogram, we can see that the obs_stat of 1.775 is well beyond the range of the graph, showing that there are zero occurrences. 
 
 Now that the test is initialized and the null distribution formed, you can calculate the p-value for your hypothesis test using the function `get_p_value`.
 
