@@ -113,8 +113,8 @@ It is not explicitly stated, but we have to assume that the CDC conducted a rand
 
 5.  Write the hypotheses for testing if the average weights are different for those who exercise at least times a week and those who don't.
 
-Null hypothesis is μ1=μ2, where both groups of students who are active >3 days and students active <= 3 days are equal in average weights.
-The alternative hypothesis is where μ1≠μ2. 
+Null hypothesis is $\mu1=\mu2$, where both groups of students who are active >3 days and students active <= 3 days are equal in average weights.
+The alternative hypothesis is where $\mu1=\mu2$. 
 
 Next, we will introduce a new function, `hypothesize`, that falls into the `infer` workflow. You will use this method for conducting hypothesis tests. 
 
@@ -167,18 +167,86 @@ This the standard workflow for performing hypothesis tests.
 
 7.  Construct and record a confidence interval for the difference between the weights of those who exercise at least three times a week and those who don't, and interpret this interval in context of the data.
 
+The confidence interval ranges between -0.662 to 0.666, inclusive of zero. This means that we fail to reject that there is a difference between btoh groups.
+
+```{r ci}
+yrbss %>%
+  drop_na(weight,physical_3plus) %>%
+  specify(weight ~ physical_3plus) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no")) |> 
+  get_ci(level = 0.95)
+```
+
 * * *
 
 ## More Practice
 
 8.  Calculate a 95% confidence interval for the average height in meters (`height`) and interpret it in context.
 
+We are 95% confident, that the average height of students are between 1.69 and 1.69 meters. Rounding issues are not showing. 
+
+```{r ci2}
+yrbss %>%
+  drop_na(height) %>%
+  specify(response = height) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "mean") |> 
+  get_ci(level = 0.95)
+```
+
 9.  Calculate a new confidence interval for the same parameter at the 90% confidence level. Comment on the width of this interval versus the one obtained in the previous exercise.
+
+The width is the same due to rounding, but it should be smaller because we are accounting for a smaller spread from the mean of the data. 
+
+```{r ci3}
+yrbss %>%
+  drop_na(height) %>%
+  specify(response = height) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "mean") |> 
+  get_ci(level = 0.90)
+```
 
 10.  Conduct a hypothesis test evaluating whether the average height is different for those who exercise at least three times a week and those who don't.
 
+Null hypothesis is $\mu1=\mu2$, where both groups of students who are active >3 days and students active <= 3 days are equal in average heights.
+The alternative hypothesis is where $\mu1=\mu2$. 
+
 11.  Now, a non-inference task: Determine the number of different options there are in the dataset for the `hours_tv_per_school_day` there are.
 
+There are seven distinct groups not including NA 
+
+``` {r distimct}
+yrbss |> 
+distinct(hours_tv_per_school_day)
+```
+
 12. Come up with a research question evaluating the relationship between height or weight and sleep. Formulate the question in a way that it can be answered using a hypothesis test and/or a confidence interval. Report the statistical results, and also provide an explanation in plain language. Be sure to check all assumptions, state your $\alpha$ level, and conclude in context.
+
+Are students on average taller than students who sleep less than 8 hours? 
+
+```{r hyp test}
+yrbss |> 
+distinct(school_night_hours_sleep)
+
+yrbss <- yrbss %>% 
+  mutate(sleep_less = 
+           ifelse(!school_night_hours_sleep %in% c('8', '9', '10+'), 'yes', 'no'))
+
+test_hyp <- yrbss %>% 
+  drop_na(sleep_less, height)
+
+test_hyp %>%
+  specify(height ~ sleep_less) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "diff in means", order = c("yes", "no")) |> 
+  get_ci(level = 0.95)
+  
+```
+
+We can see that the confidence interval between -0.00528 and 0.00250 include 0, so this means with a 95% confidence interval, we fail to rejec the null hypothesis. This means that students who sleep 8 or more hours compares to those that do not, there is no difference. 
 
 * * *
